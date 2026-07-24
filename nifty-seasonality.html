@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nifty 50 · The Seasonal Year (2015–2025)</title>
+<style>
+  :root{
+    --bg:#0e1117; --panel:#161b24; --panel-2:#1d2430; --line:#28313f;
+    --ink:#e7ecf3; --ink-dim:#8b97a8; --ink-faint:#5e6a7c;
+    --up:#1fb87a; --down:#e2564d; --gold:#e3b341; --flat:#3a4453;
+    --mono:"SFMono-Regular",ui-monospace,"DejaVu Sans Mono","Roboto Mono",Menlo,Consolas,monospace;
+    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);
+    line-height:1.5;-webkit-font-smoothing:antialiased;padding:clamp(16px,4vw,40px)}
+  .wrap{max-width:1140px;margin:0 auto}
+
+  .tape{font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--ink-faint);
+    text-transform:uppercase;display:flex;gap:18px;flex-wrap:wrap;align-items:center;
+    border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:22px}
+  .tape b{color:var(--gold);font-weight:600}
+  .up{color:var(--up)} .down{color:var(--down)} .pos{color:var(--up)} .neg{color:var(--down)}
+
+  h1{font-size:clamp(26px,5vw,44px);line-height:1.04;margin:0 0 6px;font-weight:800;letter-spacing:-.02em}
+  h1 .accent{color:var(--gold)}
+  .sub{color:var(--ink-dim);max-width:64ch;margin:0 0 26px;font-size:15px}
+
+  /* hero year-shape */
+  .hero{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:20px clamp(16px,2.5vw,26px) 22px;margin-bottom:16px}
+  .hero-head{display:flex;justify-content:space-between;align-items:flex-end;
+    flex-wrap:wrap;gap:14px;margin-bottom:18px}
+  .hero-head h2{font-size:13px;font-family:var(--mono);letter-spacing:.12em;
+    text-transform:uppercase;color:var(--ink-dim);margin:0;font-weight:600}
+  .hero-head .hint{font-size:12px;color:var(--ink-faint)}
+  .seg{display:inline-flex;background:var(--panel-2);border:1px solid var(--line);
+    border-radius:9px;padding:3px;gap:2px}
+  .seg button{appearance:none;border:0;background:transparent;color:var(--ink-dim);
+    font-family:var(--sans);font-size:12.5px;font-weight:600;padding:6px 13px;
+    border-radius:7px;cursor:pointer;transition:.16s}
+  .seg button:hover{color:var(--ink)}
+  .seg button[aria-pressed="true"]{background:var(--bg);color:var(--gold);box-shadow:inset 0 0 0 1px var(--line)}
+  .seg button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+  .yearshape{display:flex;align-items:stretch;gap:clamp(3px,1vw,10px);height:200px;position:relative}
+  .ys-zero{position:absolute;left:0;right:0;border-top:1px dashed var(--line);pointer-events:none}
+  .mbar{flex:1;display:flex;flex-direction:column;cursor:pointer;border:0;background:transparent;
+    padding:0;font-family:inherit;position:relative}
+  .mbar .plot{flex:1;position:relative;width:100%}
+  .mbar .col{position:absolute;left:15%;width:70%;border-radius:4px;transition:.45s cubic-bezier(.2,.7,.3,1)}
+  .mbar .v{position:absolute;width:100%;text-align:center;font-family:var(--mono);
+    font-size:10.5px;font-weight:600;white-space:nowrap}
+  .mbar .ml{font-family:var(--mono);font-size:11px;color:var(--ink-faint);text-align:center;
+    padding-top:9px;transition:.16s}
+  .mbar:hover .ml{color:var(--ink)}
+  .mbar[aria-pressed="true"] .ml{color:var(--gold);font-weight:700}
+  .mbar[aria-pressed="true"]::after{content:"";position:absolute;inset:-6px -2px 16px;
+    border:1px solid rgba(227,179,65,.4);border-radius:8px;background:rgba(227,179,65,.05)}
+  .mbar:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:6px}
+
+  /* stat row */
+  .stats{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:16px}
+  .stat{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .stat .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;
+    color:var(--ink-faint);margin-bottom:8px}
+  .stat .v{font-family:var(--mono);font-size:24px;font-weight:600;line-height:1}
+  .stat .vsub{font-family:var(--mono);font-size:11px;color:var(--ink-faint);margin-top:5px}
+
+  .grid2{display:grid;grid-template-columns:1.15fr .85fr;gap:16px;margin-bottom:16px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+    padding:20px clamp(14px,2.2vw,22px)}
+  .panel h2{font-size:13px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-dim);margin:0 0 4px;font-weight:600}
+  .panel h2 .mo{color:var(--gold)}
+  .panel .note{font-size:12px;color:var(--ink-faint);margin:0 0 16px}
+
+  /* yearly bars */
+  .bars{display:flex;align-items:stretch;gap:clamp(3px,1vw,9px);height:210px;position:relative}
+  .bzero{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
+  .bar{flex:1;display:flex;flex-direction:column}
+  .bar .plot{flex:1;position:relative}
+  .bar .col{position:absolute;left:12%;width:76%;border-radius:3px;transition:.45s cubic-bezier(.2,.7,.3,1)}
+  .bar .v{position:absolute;width:100%;text-align:center;font-family:var(--mono);font-size:9.5px;font-weight:600;white-space:nowrap}
+  .bar .yr{font-family:var(--mono);font-size:10px;color:var(--ink-faint);text-align:center;padding-top:8px}
+
+  /* rankings */
+  .rank h3{font-family:var(--mono);font-size:10px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-faint);margin:0 0 9px;font-weight:600}
+  .rank-list{display:flex;flex-direction:column;gap:5px;margin-bottom:18px}
+  .rank-row{display:flex;align-items:center;gap:9px;font-size:13px;background:var(--panel-2);
+    border-radius:7px;padding:7px 11px;cursor:pointer;border:1px solid transparent;transition:.14s}
+  .rank-row:hover{border-color:var(--line)}
+  .rank-row.sel{border-color:var(--gold)}
+  .rank-row .rmo{font-family:var(--mono);width:34px;color:var(--ink-dim)}
+  .rank-row .rbar{flex:1;height:6px;border-radius:3px;background:var(--flat);position:relative;overflow:hidden}
+  .rank-row .rbar i{position:absolute;top:0;bottom:0;border-radius:3px}
+  .rank-row .rv{font-family:var(--mono);font-size:12px;width:52px;text-align:right}
+
+  /* heatmap */
+  .heatwrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .heat{border-collapse:separate;border-spacing:4px;font-family:var(--mono);min-width:760px;width:100%}
+  .heat th{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);
+    font-weight:500;padding:4px 2px;text-align:center}
+  .heat th.mh{cursor:pointer;border-radius:6px;transition:.14s}
+  .heat th.mh:hover{color:var(--ink);background:var(--panel-2)}
+  .heat th.mh.sel{color:var(--gold)}
+  .heat td.yr{color:var(--ink-dim);font-size:11px;text-align:right;padding-right:6px;width:40px}
+  .cell{border-radius:6px;padding:9px 4px;text-align:center;font-size:11px;font-weight:600;
+    color:#0c0f14;min-width:50px;transition:.14s}
+  .cell.dim{opacity:.32}
+  .heat tr.agg td{font-size:11px}
+  .heat tr.agg .lbl{color:var(--ink-faint);font-size:9px;letter-spacing:.08em;text-transform:uppercase;text-align:right;padding-right:6px}
+  .heat .aggcell{border-radius:6px;padding:8px 4px;text-align:center;font-weight:700;font-size:11px}
+  .legend{display:flex;align-items:center;gap:0;margin-top:14px;font-family:var(--mono);
+    font-size:10px;color:var(--ink-faint);flex-wrap:wrap}
+  .legend .sw{height:11px;width:26px}
+  .legend .sw:first-of-type{border-radius:3px 0 0 3px} .legend .sw:last-of-type{border-radius:0 3px 3px 0}
+  .legend span{margin:0 8px}
+
+  .insights{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:4px}
+  .insight{border-left:2px solid var(--gold);padding:2px 0 2px 15px}
+  .insight.good{border-color:var(--up)} .insight.warn{border-color:var(--down)}
+  .insight h3{font-size:14px;margin:0 0 5px;font-weight:700}
+  .insight p{font-size:13px;color:var(--ink-dim);margin:0}
+
+  .foot{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);
+    font-size:11.5px;color:var(--ink-faint);line-height:1.6}
+  .foot b{color:var(--ink-dim)}
+
+  @media (max-width:880px){.grid2{grid-template-columns:1fr}.stats{grid-template-columns:repeat(3,1fr)}}
+  @media (max-width:560px){.stats{grid-template-columns:repeat(2,1fr)}.yearshape{height:170px}
+    .mbar .v{display:none}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tape">
+    <span><b>NSE</b> SEASONAL DESK</span>
+    <span>INDEX · <b>NIFTY 50</b></span>
+    <span>SAMPLE · <b>2015–2025</b> (11Y)</span>
+    <span id="tape-live"></span>
+  </div>
+
+  <h1>The <span class="accent">seasonal year</span>, month by month</h1>
+  <p class="sub">Every month Nifty 50 has traded over the last 11 years. The bar row below is the
+  calendar's shape — pick any month to drill into its 11-year record, or read the full grid further down.
+  Your two months, <b>July</b> and <b>August</b>, are pre-selected context.</p>
+
+  <div class="hero">
+    <div class="hero-head">
+      <h2>The year's shape</h2>
+      <div class="seg" role="group" aria-label="Metric">
+        <button id="x-avg" aria-pressed="true" onclick="setMetric('avg')">Avg return</button>
+        <button id="x-hit" aria-pressed="false" onclick="setMetric('hit')">Hit rate</button>
+        <button id="x-vol" aria-pressed="false" onclick="setMetric('vol')">Volatility</button>
+      </div>
+      <span class="hint" id="hero-hint">Tap a month to drill in</span>
+    </div>
+    <div class="yearshape" id="yearshape"><div class="ys-zero" id="ys-zero"></div></div>
+  </div>
+
+  <div class="stats" id="stats"></div>
+
+  <div class="grid2">
+    <div class="panel">
+      <h2>Year-by-year — <span class="mo" id="bar-mo">July</span></h2>
+      <p class="note">Each bar = that month's % change, close over prior-month close.</p>
+      <div class="bars" id="bars"><div class="bzero" id="bzero"></div></div>
+    </div>
+    <div class="panel rank">
+      <h2>League tables</h2>
+      <p class="note">All 12 months ranked. Click any month to load it.</p>
+      <h3>Strongest by average</h3>
+      <div class="rank-list" id="rank-avg"></div>
+      <h3>Most reliable (hit rate)</h3>
+      <div class="rank-list" id="rank-hit"></div>
+    </div>
+  </div>
+
+  <div class="panel" style="margin-bottom:16px">
+    <h2>The full grid — 11 years × 12 months</h2>
+    <p class="note">Green = up, red = down; intensity scales with the move (capped at ±10% so the COVID
+      months don't wash everything out). Bottom rows show the 11-year average and the up-month hit rate.
+      Click a month header to drill in.</p>
+    <div class="heatwrap">
+      <table class="heat" id="heat"></table>
+    </div>
+    <div class="legend">
+      <span>−10%</span>
+      <div class="sw" style="background:#e2564d"></div><div class="sw" style="background:#ea8a83"></div>
+      <div class="sw" style="background:#3a4453"></div>
+      <div class="sw" style="background:#7fd3ad"></div><div class="sw" style="background:#1fb87a"></div>
+      <span>+10%</span>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>What the seasonal map says</h2>
+    <div class="insights" id="insights"></div>
+  </div>
+
+  <div class="foot">
+    <b>Data.</b> Nifty 50 (price index) month-close returns, Jan-2015 to Dec-2025, from public month-close
+    records cross-checked against index levels. All figures are exact. <b>Bank Nifty was deliberately left
+    out of this full-year version</b> — I couldn't source a clean, verified 12-month Bank Nifty history, and
+    filling 130+ cells from memory would put unreliable numbers next to exact ones. The earlier Jul–Aug
+    dashboard keeps Bank Nifty (flagged approximate). To add an exact Bank Nifty layer here, drop in a CSV of
+    its monthly closes and it goes straight in.<br><br>
+    <b>Reading it safely.</b> 11 years is a small sample; a single event (COVID Mar-2020 −23%, Apr-2020 +15%)
+    can dominate a month's average — lean on the median and hit rate, not just the mean. Seasonality is
+    context, not a signal. <b>Not investment advice;</b> past patterns don't predict future returns. Manage
+    your own risk.
+  </div>
+
+</div>
+
+<script>
+const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const YEARS=[2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+// rows = years, cols = Jan..Dec  (Nifty 50, exact)
+const M=[
+ [ 6.35, 0.41,-4.00,-3.65, 3.08,-0.77, 1.96,-6.58,-0.28, 1.47,-1.62, 0.14],
+ [-4.82,-7.62,10.75, 1.44, 3.95, 1.56, 4.23, 1.71,-1.99, 0.31,-4.79,-0.47],
+ [ 4.59, 3.72, 3.31, 1.42, 3.41,-1.04, 5.84,-1.58,-1.30, 5.59,-1.05, 2.97],
+ [ 4.72,-4.85,-3.61, 6.19,-0.03,-0.20, 5.99, 2.85,-6.42,-4.98, 4.72,-0.13],
+ [-0.29,-0.36, 7.20, 1.54, 1.49,-1.12,-5.69,-0.85, 4.09, 3.51, 1.50, 0.93],
+ [-1.70,-6.36,-23.25,14.68,-2.84, 7.53, 7.49, 2.84,-1.23, 3.51,11.39, 7.81],
+ [-2.48, 6.56, 1.11,-0.41, 6.50, 0.89, 0.26, 8.69, 2.84, 0.30,-3.90, 2.18],
+ [-0.08,-3.15, 3.99,-2.07,-3.03,-4.85, 8.73, 3.50,-3.74, 5.37, 4.14,-3.48],
+ [-2.45,-1.43,-0.29, 4.06, 2.60, 3.53, 2.94,-2.53, 2.00,-2.84, 5.52, 7.94],
+ [-0.03, 1.18, 1.57, 1.24,-0.33, 6.57, 3.92, 1.14, 2.28,-6.22,-0.31,-2.02],
+ [-0.58,-5.89, 5.83, 3.93, 1.71, 3.10,-2.93,-1.38, 0.75, 4.51, 1.87,-0.28]
+];
+
+function colOf(mi){return M.map(r=>r[mi]);}
+function stats(arr){
+  const n=arr.length, avg=arr.reduce((a,b)=>a+b,0)/n;
+  const sorted=arr.slice().sort((a,b)=>a-b);
+  const median=sorted[Math.floor(n/2)];
+  const pos=arr.filter(v=>v>0).length, hit=pos/n*100;
+  const best=Math.max(...arr), worst=Math.min(...arr);
+  const sd=Math.sqrt(arr.reduce((a,b)=>a+(b-avg)**2,0)/n);
+  return {avg,median,hit,best,worst,sd,pos,neg:n-pos,n,
+    bestYr:YEARS[arr.indexOf(best)],worstYr:YEARS[arr.indexOf(worst)]};
+}
+const MSTAT=MONTHS.map((_,i)=>stats(colOf(i)));
+
+let curMo=6, metric="avg"; // default July
+
+const fmt=v=>(v>=0?"+":"")+v.toFixed(2)+"%";
+const cls=v=>v>0?"pos":v<0?"neg":"";
+function mix(a,b,t){return `rgb(${Math.round(a[0]+(b[0]-a[0])*t)},${Math.round(a[1]+(b[1]-a[1])*t)},${Math.round(a[2]+(b[2]-a[2])*t)})`;}
+function heat(v,cap=10){
+  if(Math.abs(v)<0.05)return "#3a4453";
+  const t=Math.min(1,Math.abs(v)/cap);
+  return v>0?mix([58,68,83],[31,184,122],Math.max(.28,t)):mix([58,68,83],[226,86,77],Math.max(.28,t));
+}
+
+function render(){
+  renderHero();
+  renderStats();
+  renderBars();
+  renderRanks();
+  renderHeat();
+  renderInsights();
+  const s=MSTAT[curMo];
+  document.getElementById("tape-live").innerHTML=
+    `${MONTHS[curMo].toUpperCase()} · AVG <span class="${cls(s.avg)}">${fmt(s.avg)}</span> · HIT <b>${s.hit.toFixed(0)}%</b>`;
+}
+
+function metricVal(i){const s=MSTAT[i];return metric==="avg"?s.avg:metric==="hit"?s.hit:s.sd;}
+function renderHero(){
+  const ys=document.getElementById("yearshape");
+  ys.querySelectorAll(".mbar").forEach(b=>b.remove());
+  const vals=MONTHS.map((_,i)=>metricVal(i));
+  const ys0=document.getElementById("ys-zero");
+  if(metric==="avg"){
+    const mx=Math.max(...vals.map(Math.abs))*1.18, zero=50;
+    ys0.style.display="block"; ys0.style.top=zero+"%";
+    MONTHS.forEach((m,i)=>{
+      const v=vals[i], up=v>=0, h=Math.abs(v)/mx*46;
+      ys.appendChild(makeBar(i,m,fmt(v),up,h,zero,up?'var(--up)':'var(--down)'));
+    });
+  } else {
+    ys0.style.display="none";
+    const mx=Math.max(...vals)*1.12, zero=100;
+    MONTHS.forEach((m,i)=>{
+      const v=vals[i], h=v/mx*92;
+      const col = metric==="hit" ? (v>=60?'var(--up)':v<=45?'var(--down)':'var(--gold)') : 'var(--gold)';
+      const label = metric==="hit"?v.toFixed(0)+"%":v.toFixed(1);
+      ys.appendChild(makeBar(i,m,label,true,h,zero,col,true));
+    });
+  }
+}
+function makeBar(i,m,label,up,h,zeroPct,color,fromBottom){
+  const b=document.createElement("button");
+  b.className="mbar"; b.setAttribute("aria-pressed",i===curMo);
+  b.setAttribute("aria-label",m+" "+label); b.onclick=()=>{curMo=i;render();};
+  b.innerHTML=`<div class="plot">
+      <div class="col" style="background:${color};${fromBottom?'bottom:0;':(up?'bottom:'+(100-zeroPct)+'%;':'top:'+zeroPct+'%;')}height:0"></div>
+      <div class="v ${up?'pos':'neg'}" style="${up?'bottom:'+(100-zeroPct)+'%;margin-bottom:'+(h)+'%':'top:'+zeroPct+'%;margin-top:'+(h)+'%'};${up?'padding-bottom:3px':'padding-top:3px'}">${label}</div>
+    </div><div class="ml">${m}</div>`;
+  requestAnimationFrame(()=>{b.querySelector(".col").style.height=h+"%";});
+  return b;
+}
+
+function renderStats(){
+  const s=MSTAT[curMo];
+  document.getElementById("stats").innerHTML=`
+   <div class="stat"><div class="k">Avg return</div><div class="v ${cls(s.avg)}">${fmt(s.avg)}</div><div class="vsub">11-yr mean</div></div>
+   <div class="stat"><div class="k">Median</div><div class="v ${cls(s.median)}">${fmt(s.median)}</div><div class="vsub">typical year</div></div>
+   <div class="stat"><div class="k">Hit rate</div><div class="v ${s.hit>=60?'pos':s.hit<=45?'neg':''}">${s.hit.toFixed(0)}%</div><div class="vsub">${s.pos} up · ${s.neg} down</div></div>
+   <div class="stat"><div class="k">Best</div><div class="v pos">${fmt(s.best)}</div><div class="vsub">${s.bestYr}</div></div>
+   <div class="stat"><div class="k">Worst</div><div class="v neg">${fmt(s.worst)}</div><div class="vsub">${s.worstYr}</div></div>
+   <div class="stat"><div class="k">Volatility</div><div class="v">${s.sd.toFixed(2)}</div><div class="vsub">std dev (%)</div></div>`;
+}
+
+function renderBars(){
+  document.getElementById("bar-mo").textContent=MONTHS[curMo];
+  const arr=colOf(curMo), mx=Math.max(...arr.map(Math.abs))*1.16, zero=50;
+  const bars=document.getElementById("bars");
+  bars.querySelectorAll(".bar").forEach(b=>b.remove());
+  document.getElementById("bzero").style.top=zero+"%";
+  arr.forEach((v,i)=>{
+    const up=v>=0, h=Math.abs(v)/mx*46;
+    const bar=document.createElement("div"); bar.className="bar";
+    bar.innerHTML=`<div class="plot">
+        <div class="col" style="background:${up?'var(--up)':'var(--down)'};${up?'bottom:'+(100-zero)+'%;':'top:'+zero+'%;'}height:0"></div>
+        <div class="v ${up?'pos':'neg'}" style="${up?'bottom:'+(100-zero)+'%;margin-bottom:'+h+'%;padding-bottom:3px':'top:'+zero+'%;margin-top:'+h+'%;padding-top:3px'}">${v.toFixed(1)}</div>
+      </div><div class="yr">'${String(YEARS[i]).slice(2)}</div>`;
+    bars.appendChild(bar);
+    requestAnimationFrame(()=>{bar.querySelector(".col").style.height=h+"%";});
+  });
+}
+
+function renderRanks(){
+  const byAvg=MONTHS.map((m,i)=>({i,m,v:MSTAT[i].avg})).sort((a,b)=>b.v-a.v);
+  const byHit=MONTHS.map((m,i)=>({i,m,v:MSTAT[i].hit})).sort((a,b)=>b.v-a.v);
+  const mxA=Math.max(...byAvg.map(x=>Math.abs(x.v)));
+  document.getElementById("rank-avg").innerHTML=byAvg.map(x=>{
+    const w=Math.abs(x.v)/mxA*100, up=x.v>=0;
+    return `<div class="rank-row ${x.i===curMo?'sel':''}" onclick="curMo=${x.i};render()">
+      <span class="rmo">${x.m}</span>
+      <span class="rbar"><i style="${up?'left:50%':'right:50%'};width:${w/2}%;background:${up?'var(--up)':'var(--down)'}"></i></span>
+      <span class="rv ${cls(x.v)}">${fmt(x.v)}</span></div>`;}).join("");
+  document.getElementById("rank-hit").innerHTML=byHit.map(x=>{
+    return `<div class="rank-row ${x.i===curMo?'sel':''}" onclick="curMo=${x.i};render()">
+      <span class="rmo">${x.m}</span>
+      <span class="rbar"><i style="left:0;width:${x.v}%;background:${x.v>=60?'var(--up)':x.v<=45?'var(--down)':'var(--gold)'}"></i></span>
+      <span class="rv">${x.v.toFixed(0)}%</span></div>`;}).join("");
+}
+
+function renderHeat(){
+  let head=`<tr><th></th>`+MONTHS.map((m,i)=>`<th class="mh ${i===curMo?'sel':''}" onclick="curMo=${i};render()">${m}</th>`).join("")+`</tr>`;
+  let rows="";
+  YEARS.forEach((y,r)=>{
+    rows+=`<tr><td class="yr">${y}</td>`+M[r].map((v,c)=>
+      `<td><div class="cell ${c===curMo?'':'dim'}" style="background:${heat(v)}">${v.toFixed(1)}</div></td>`).join("")+`</tr>`;
+  });
+  // aggregate rows
+  let avgRow=`<tr class="agg"><td class="lbl">Avg</td>`+MONTHS.map((m,i)=>{
+    const v=MSTAT[i].avg;return `<td><div class="aggcell" style="background:${heat(v)}">${fmt(v)}</div></td>`;}).join("")+`</tr>`;
+  let hitRow=`<tr class="agg"><td class="lbl">Hit%</td>`+MONTHS.map((m,i)=>{
+    const v=MSTAT[i].hit;const bg=v>=60?'rgba(31,184,122,.22)':v<=45?'rgba(226,86,77,.22)':'rgba(227,179,65,.18)';
+    const fg=v>=60?'var(--up)':v<=45?'var(--down)':'var(--gold)';
+    return `<td><div class="aggcell" style="background:${bg};color:${fg}">${v.toFixed(0)}</div></td>`;}).join("")+`</tr>`;
+  document.getElementById("heat").innerHTML=head+rows+avgRow+hitRow;
+}
+
+function renderInsights(){
+  const byAvg=MONTHS.map((m,i)=>({i,m,s:MSTAT[i]})).sort((a,b)=>b.s.avg-a.s.avg);
+  const byHit=MONTHS.map((m,i)=>({i,m,s:MSTAT[i]})).sort((a,b)=>b.s.hit-a.s.hit);
+  const byVol=MONTHS.map((m,i)=>({i,m,s:MSTAT[i]})).sort((a,b)=>b.s.sd-a.s.sd);
+  const s=MSTAT[curMo], mo=MONTHS[curMo];
+  const cards=[
+    ["good",`${mo} in focus`,
+      `Over 11 years ${mo} averaged ${fmt(s.avg)} (median ${fmt(s.median)}) and closed up ${s.pos} of ${s.n} times (${s.hit.toFixed(0)}%). Best ${fmt(s.best)} in ${s.bestYr}, worst ${fmt(s.worst)} in ${s.worstYr}.`],
+    ["good","Seasonal sweet spots",
+      `Strongest average months: ${byAvg[0].m} (${fmt(byAvg[0].s.avg)}), ${byAvg[1].m} (${fmt(byAvg[1].s.avg)}), ${byAvg[2].m} (${fmt(byAvg[2].s.avg)}). July sits among the most dependable in the year.`],
+    ["warn","Weak / risky months",
+      `Lowest averages: ${byAvg[11].m} (${fmt(byAvg[11].s.avg)}) and ${byAvg[10].m} (${fmt(byAvg[10].s.avg)}). Most volatile: ${byVol[0].m} and ${byVol[1].m} — wide outcomes, weaker for directional carry.`],
+    ["", "Most & least reliable",
+      `Highest hit-rate months: ${byHit[0].m} (${byHit[0].s.hit.toFixed(0)}%) and ${byHit[1].m} (${byHit[1].s.hit.toFixed(0)}%). Lowest: ${byHit[11].m} (${byHit[11].s.hit.toFixed(0)}%) — closer to a coin-flip than a trend.`]
+  ];
+  document.getElementById("insights").innerHTML=cards.map(c=>
+    `<div class="insight ${c[0]}"><h3>${c[1]}</h3><p>${c[2]}</p></div>`).join("");
+}
+
+function setMetric(m){
+  metric=m;
+  ["avg","hit","vol"].forEach(x=>document.getElementById("x-"+x).setAttribute("aria-pressed",x===m));
+  document.getElementById("hero-hint").textContent=
+    m==="avg"?"Tap a month to drill in":m==="hit"?"% of years that month closed green":"Std dev of monthly returns (%)";
+  renderHero();
+}
+render();
+</script>
+</body>
+</html>
