@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TWP Tools — Market Studies by Trade With Pavan</title>
+<meta name="description" content="Free market study dashboards — Nifty festival seasonality, monthly seasonality and more. Educational backtests by Trade With Pavan.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0C0F14; --surface:#151A22; --surface2:#1B222D; --line:#242D3A;
+  --ink:#EDEBE6; --muted:#7E8794;
+  --marigold:#F2A93B; --bear:#F23645; --bull:#0A9E86;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background:var(--bg); color:var(--ink); font-family:'IBM Plex Sans',sans-serif; min-height:100vh; display:flex; flex-direction:column; }
+a { color:inherit; text-decoration:none; }
+
+/* ambient candle strip along top */
+.tape { display:flex; gap:5px; padding:14px 0 0 26px; overflow:hidden; height:46px; }
+.tape i { width:8px; border-radius:2px; align-self:flex-end; opacity:.85; }
+.tape i.g { background:var(--bull); } .tape i.r { background:var(--bear); }
+
+.wrap { max-width:960px; margin:0 auto; padding:40px 26px 60px; width:100%; flex:1; }
+.eyebrow { font-family:'IBM Plex Mono'; font-size:12px; letter-spacing:.22em; color:var(--marigold); text-transform:uppercase; }
+h1 { font-family:'Anton'; font-size:clamp(44px,8vw,84px); line-height:.95; letter-spacing:.01em; margin:10px 0 14px; }
+h1 em { font-style:normal; color:var(--marigold); }
+.lede { color:var(--muted); font-size:16px; max-width:560px; line-height:1.65; }
+
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:18px; margin-top:44px; }
+.tool { background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:26px 26px 22px; display:flex; flex-direction:column; gap:12px; transition:.18s; position:relative; overflow:hidden; }
+.tool::after { content:'→'; position:absolute; right:22px; bottom:16px; font-family:'IBM Plex Mono'; font-size:20px; color:var(--muted); transition:.18s; }
+.tool:hover { border-color:var(--marigold); transform:translateY(-4px); }
+.tool:hover::after { color:var(--marigold); transform:translateX(4px); }
+.tool:focus-visible { outline:2px solid var(--marigold); outline-offset:3px; }
+.tool-emoji { font-size:34px; }
+.tool h2 { font-family:'Anton'; font-size:26px; letter-spacing:.02em; }
+.tool p { color:var(--muted); font-size:14px; line-height:1.6; }
+.tool .meta { font-family:'IBM Plex Mono'; font-size:11px; letter-spacing:.1em; color:var(--marigold); text-transform:uppercase; margin-top:auto; padding-top:8px; }
+.tool.soon { opacity:.55; cursor:default; }
+.tool.soon:hover { border-color:var(--line); transform:none; }
+.tool.soon::after { content:''; }
+
+footer { border-top:1px solid var(--line); }
+.foot { max-width:960px; margin:0 auto; padding:18px 26px 30px; font-family:'IBM Plex Mono'; font-size:11px; color:var(--muted); line-height:1.7; letter-spacing:.03em; }
+.foot b { color:var(--marigold); }
+
+@media (max-width:600px){ .wrap { padding:28px 18px 44px; } }
+</style>
+</head>
+<body>
+
+<div class="tape" aria-hidden="true">
+  <i class="g" style="height:18px"></i><i class="g" style="height:26px"></i><i class="r" style="height:14px"></i>
+  <i class="g" style="height:30px"></i><i class="r" style="height:22px"></i><i class="r" style="height:12px"></i>
+  <i class="g" style="height:24px"></i><i class="g" style="height:34px"></i><i class="r" style="height:16px"></i>
+  <i class="g" style="height:28px"></i><i class="r" style="height:20px"></i><i class="g" style="height:36px"></i>
+  <i class="r" style="height:14px"></i><i class="g" style="height:22px"></i><i class="g" style="height:30px"></i>
+  <i class="r" style="height:18px"></i><i class="g" style="height:26px"></i><i class="r" style="height:12px"></i>
+  <i class="g" style="height:32px"></i><i class="g" style="height:24px"></i>
+</div>
+
+<div class="wrap">
+  <span class="eyebrow">Trade With Pavan · Market Studies</span>
+  <h1>TWP <em>TOOLS</em></h1>
+  <p class="lede">Free, data-first dashboards built from manual backtests on Nifty. No signals, no predictions — just the charts, side by side, so you can judge the pattern yourself.</p>
+
+  <div class="grid">
+    <a class="tool" href="./festival-effect/">
+      <span class="tool-emoji">🪔</span>
+      <h2>Festival Effect</h2>
+      <p>Do Indian festivals move Nifty? 61 chart studies across 20 festivals — Holi to Diwali, Eid to Good Friday — compared side by side for 2023–2026.</p>
+      <span class="meta">61 charts · 20 festivals · 4 years</span>
+    </a>
+
+    <a class="tool" href="./nifty-seasonality/">
+      <span class="tool-emoji">📅</span>
+      <h2>Nifty Seasonality</h2>
+      <p>Month-by-month behaviour of Nifty and BankNifty — which months historically trend, chop, or bleed, and how the current year is tracking.</p>
+      <span class="meta">Monthly patterns · Nifty / BankNifty</span>
+    </a>
+
+    <div class="tool soon" aria-disabled="true">
+      <span class="tool-emoji">🌕</span>
+      <h2>Coming Soon</h2>
+      <p>Next study in the pipeline. Follow @tradewithpavan for the drop.</p>
+      <span class="meta">In the lab</span>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p class="foot"><b>EDUCATIONAL ONLY.</b> These are small-sample historical studies, not investment advice and not trading signals. Patterns fail. Do your own research and consult a SEBI-registered advisor before trading. · TRADE WITH PAVAN</p>
+</footer>
+
+</body>
+</html>
